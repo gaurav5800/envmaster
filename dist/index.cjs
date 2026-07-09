@@ -114,8 +114,40 @@ function doctorCommand() {
 
 // src/commands/sync.ts
 var import_chalk2 = __toESM(require("chalk"), 1);
+
+// src/core/writer.ts
+var import_fs3 = __toESM(require("fs"), 1);
+function writeEnvExample(filePath, variables) {
+  const content = variables.map((v) => `${v.key}=`).join("\n");
+  import_fs3.default.writeFileSync(filePath, content);
+}
+
+// src/commands/sync.ts
 function syncCommand() {
   console.log(import_chalk2.default.blue("\n\u{1F504} Syncing .env.example...\n"));
+  const envVariables = parseEnvFile(".env");
+  const exampleVariables = parseEnvFile(".env.example");
+  const comparison = compareEnvFiles(
+    envVariables,
+    exampleVariables
+  );
+  if (comparison.missingInExample.length === 0) {
+    console.log(import_chalk2.default.green("\u2705 .env.example is already up to date."));
+    return;
+  }
+  console.log("Adding missing keys:");
+  comparison.missingInExample.forEach((key) => {
+    console.log(`+ ${key}`);
+  });
+  const updatedVariables = [
+    ...exampleVariables,
+    ...comparison.missingInExample.map((key) => ({
+      key,
+      value: ""
+    }))
+  ];
+  writeEnvExample(".env.example", updatedVariables);
+  console.log(import_chalk2.default.green("\n\u2705 .env.example updated successfully!"));
 }
 
 // src/index.ts

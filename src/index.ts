@@ -2,6 +2,10 @@
 
 import { Command } from "commander";
 import { doctorCommand } from "./commands/doctor";
+ import { syncCommand } from "./commands/sync";
+
+ 
+
 const program = new Command();
 
 program
@@ -11,6 +15,11 @@ program
 
 
 
+
+program
+  .command("sync")
+  .description("Sync .env.example with .env")
+  .action(syncCommand);
 
   program
   .command("doctor")

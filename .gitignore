@@ -14,11 +14,11 @@ npm-debug.log*
 .env.production
 .env.development
 
-# OS
-.DS_Store
-
 # IDE
 .vscode/
+
+# macOS
+.DS_Store
 
 # Coverage
 coverage/

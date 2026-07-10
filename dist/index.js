@@ -290,6 +290,7 @@ import chalk7 from "chalk";
 // src/core/linter.ts
 function lintEnv(content) {
   const issues = [];
+  const seen = /* @__PURE__ */ new Set();
   const lines = content.split("\n");
   lines.forEach((line, index) => {
     const lineNumber = index + 1;
@@ -304,6 +305,14 @@ function lintEnv(content) {
     }
     const [key] = line.split("=");
     const variableName = key.trim();
+    if (seen.has(variableName)) {
+      issues.push({
+        line: lineNumber,
+        message: "Duplicate variable"
+      });
+    } else {
+      seen.add(variableName);
+    }
     if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(variableName)) {
       issues.push({
         line: lineNumber,
@@ -315,6 +324,13 @@ function lintEnv(content) {
       issues.push({
         line: lineNumber,
         message: "Variable name should be UPPER_CASE"
+      });
+    }
+    const value = line.split("=").slice(1).join("=").trim();
+    if (value === "") {
+      issues.push({
+        line: lineNumber,
+        message: "Empty value"
       });
     }
   });

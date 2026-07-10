@@ -3,7 +3,7 @@
 import { Command } from "commander";
 import { doctorCommand } from "./commands/doctor";
  import { syncCommand } from "./commands/sync";
-
+import { validateCommand } from "./commands/validate";
  
 
 const program = new Command();
@@ -20,7 +20,10 @@ program
   .command("sync")
   .description("Sync .env.example with .env")
   .action(syncCommand);
-
+program
+  .command("validate")
+  .description("Validate .env file")
+  .action(validateCommand);
   program
   .command("doctor")
   .description("Run environment diagnostics")

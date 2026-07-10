@@ -127,9 +127,61 @@ function syncCommand() {
   console.log(chalk2.green("\n\u2705 .env.example updated successfully!"));
 }
 
+// src/commands/validate.ts
+import chalk3 from "chalk";
+
+// src/core/validator.ts
+var ENV_NAME_REGEX = /^[A-Z_][A-Z0-9_]*$/;
+function validateVariables(variables) {
+  const errors = [];
+  const seen = /* @__PURE__ */ new Set();
+  for (const variable of variables) {
+    if (seen.has(variable.key)) {
+      errors.push({
+        key: variable.key,
+        message: "Duplicate key"
+      });
+      continue;
+    }
+    seen.add(variable.key);
+    if (!ENV_NAME_REGEX.test(variable.key)) {
+      errors.push({
+        key: variable.key,
+        message: "Invalid variable name"
+      });
+      continue;
+    }
+    if (variable.value === "") {
+      errors.push({
+        key: variable.key,
+        message: "Empty value"
+      });
+    }
+  }
+  return errors;
+}
+
+// src/commands/validate.ts
+function validateCommand() {
+  console.log(chalk3.blue("\n\u{1F50D} Validating .env file...\n"));
+  const variables = parseEnvFile(".env");
+  const errors = validateVariables(variables);
+  if (errors.length > 0) {
+    console.log(chalk3.red("Validation Errors:\n"));
+    errors.forEach((error) => {
+      console.log(chalk3.red(`\u2717 ${error.key}: ${error.message}`));
+    });
+    console.log(chalk3.red("\nValidation failed.\n"));
+    process.exit(1);
+  }
+  console.log(chalk3.green("\u2713 Validation passed.\n"));
+  console.log(chalk3.green("\nValidation passed.\n"));
+}
+
 // src/index.ts
 var program = new Command();
 program.name("envmaster").description("A modern CLI to validate, generate and manage .env files.").version("0.1.0");
 program.command("sync").description("Sync .env.example with .env").action(syncCommand);
+program.command("validate").description("Validate .env file").action(validateCommand);
 program.command("doctor").description("Run environment diagnostics").action(doctorCommand);
 program.parse();

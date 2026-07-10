@@ -150,9 +150,61 @@ function syncCommand() {
   console.log(import_chalk2.default.green("\n\u2705 .env.example updated successfully!"));
 }
 
+// src/commands/validate.ts
+var import_chalk3 = __toESM(require("chalk"), 1);
+
+// src/core/validator.ts
+var ENV_NAME_REGEX = /^[A-Z_][A-Z0-9_]*$/;
+function validateVariables(variables) {
+  const errors = [];
+  const seen = /* @__PURE__ */ new Set();
+  for (const variable of variables) {
+    if (seen.has(variable.key)) {
+      errors.push({
+        key: variable.key,
+        message: "Duplicate key"
+      });
+      continue;
+    }
+    seen.add(variable.key);
+    if (!ENV_NAME_REGEX.test(variable.key)) {
+      errors.push({
+        key: variable.key,
+        message: "Invalid variable name"
+      });
+      continue;
+    }
+    if (variable.value === "") {
+      errors.push({
+        key: variable.key,
+        message: "Empty value"
+      });
+    }
+  }
+  return errors;
+}
+
+// src/commands/validate.ts
+function validateCommand() {
+  console.log(import_chalk3.default.blue("\n\u{1F50D} Validating .env file...\n"));
+  const variables = parseEnvFile(".env");
+  const errors = validateVariables(variables);
+  if (errors.length > 0) {
+    console.log(import_chalk3.default.red("Validation Errors:\n"));
+    errors.forEach((error) => {
+      console.log(import_chalk3.default.red(`\u2717 ${error.key}: ${error.message}`));
+    });
+    console.log(import_chalk3.default.red("\nValidation failed.\n"));
+    process.exit(1);
+  }
+  console.log(import_chalk3.default.green("\u2713 Validation passed.\n"));
+  console.log(import_chalk3.default.green("\nValidation passed.\n"));
+}
+
 // src/index.ts
 var program = new import_commander.Command();
 program.name("envmaster").description("A modern CLI to validate, generate and manage .env files.").version("0.1.0");
 program.command("sync").description("Sync .env.example with .env").action(syncCommand);
+program.command("validate").description("Validate .env file").action(validateCommand);
 program.command("doctor").description("Run environment diagnostics").action(doctorCommand);
 program.parse();

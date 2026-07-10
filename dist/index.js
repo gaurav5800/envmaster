@@ -178,10 +178,197 @@ function validateCommand() {
   console.log(chalk3.green("\nValidation passed.\n"));
 }
 
+// src/commands/init.ts
+import chalk4 from "chalk";
+import fs4 from "fs";
+var DEFAULT_ENV_TEMPLATE = `# Application
+APP_NAME=
+APP_ENV=development
+PORT=3000
+
+# Database
+DATABASE_URL=
+
+# Authentication
+JWT_SECRET=
+
+# API
+API_KEY=
+`;
+function initCommand(options) {
+  console.log(chalk4.blue("\n\u{1F680} Initializing EnvMaster...\n"));
+  let envCreated = false;
+  let exampleCreated = false;
+  if (!fs4.existsSync(".env") || options.force) {
+    fs4.writeFileSync(".env", DEFAULT_ENV_TEMPLATE);
+    console.log(chalk4.green("\u2713 Created .env"));
+    envCreated = true;
+  } else {
+    console.log(chalk4.yellow("\u26A0 .env already exists (skipped)"));
+  }
+  if (!fs4.existsSync(".env.example") || options.force) {
+    fs4.writeFileSync(".env.example", DEFAULT_ENV_TEMPLATE);
+    console.log(chalk4.green("\u2713 Created .env.example"));
+    exampleCreated = true;
+  } else {
+    console.log(chalk4.yellow("\u26A0 .env.example already exists (skipped)"));
+  }
+  if (envCreated || exampleCreated) {
+    console.log(chalk4.green("\nInitialization complete.\n"));
+  } else {
+    console.log(chalk4.yellow("\nNothing was created.\n"));
+  }
+}
+
+// src/commands/generate.ts
+import chalk5 from "chalk";
+function generateCommand() {
+  console.log(chalk5.blue("\n\u2699\uFE0F Generating .env.example...\n"));
+  const variables = parseEnvFile(".env");
+  if (variables.length === 0) {
+    console.log(chalk5.red("\u274C .env not found or empty.\n"));
+    process.exit(1);
+  }
+  writeEnvExample(".env.example", variables);
+  console.log(chalk5.green("\u2705 .env.example generated successfully!\n"));
+}
+
+// src/commands/secrets.ts
+import chalk6 from "chalk";
+
+// src/core/secrets.ts
+var SECRET_PATTERNS = [
+  /^sk_live_/,
+  /^sk_test_/,
+  /^ghp_/,
+  /^AKIA[A-Z0-9]{16}$/,
+  /^eyJ/,
+  /^sk-/,
+  /^postgres:\/\//,
+  /^mysql:\/\//,
+  /^mongodb:\/\//
+];
+function detectSecrets(variables) {
+  return variables.filter((variable) => {
+    const value = variable.value.trim();
+    if (!value) {
+      return false;
+    }
+    return SECRET_PATTERNS.some((pattern) => pattern.test(value));
+  });
+}
+
+// src/commands/secrets.ts
+function secretsCommand() {
+  console.log(chalk6.blue("\n\u{1F512} Scanning .env.example...\n"));
+  const variables = parseEnvFile(".env.example");
+  if (variables.length === 0) {
+    console.log(chalk6.red("\u274C .env.example not found or empty.\n"));
+    process.exit(1);
+  }
+  const secrets = detectSecrets(variables);
+  if (secrets.length === 0) {
+    console.log(chalk6.green("\u2705 No secrets found.\n"));
+    return;
+  }
+  console.log(chalk6.red("\u274C Possible secrets detected:\n"));
+  secrets.forEach((secret) => {
+    console.log(`\u2022 ${secret.key}`);
+  });
+  console.log(
+    chalk6.yellow(`
+Found ${secrets.length} potential secret(s).
+`)
+  );
+  process.exit(1);
+}
+
+// src/commands/lint.ts
+import fs5 from "fs";
+import chalk7 from "chalk";
+
+// src/core/linter.ts
+function lintEnv(content) {
+  const issues = [];
+  const lines = content.split("\n");
+  lines.forEach((line, index) => {
+    const lineNumber = index + 1;
+    if (!line.trim() || line.trim().startsWith("#")) {
+      return;
+    }
+    if (/\s=\s|=\s|\s=/.test(line)) {
+      issues.push({
+        line: lineNumber,
+        message: "Remove spaces around '='"
+      });
+    }
+    const [key] = line.split("=");
+    const variableName = key.trim();
+    if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(variableName)) {
+      issues.push({
+        line: lineNumber,
+        message: "Invalid variable name"
+      });
+      return;
+    }
+    if (!/^[A-Z][A-Z0-9_]*$/.test(variableName)) {
+      issues.push({
+        line: lineNumber,
+        message: "Variable name should be UPPER_CASE"
+      });
+    }
+  });
+  return issues;
+}
+
+// src/commands/lint.ts
+function lintCommand() {
+  console.log(chalk7.blue("\n\u{1F50D} Linting .env...\n"));
+  if (!fs5.existsSync(".env")) {
+    console.log(chalk7.red("\u274C .env file not found.\n"));
+    process.exit(1);
+  }
+  const content = fs5.readFileSync(".env", "utf8");
+  const issues = lintEnv(content);
+  if (issues.length === 0) {
+    console.log(chalk7.green("\u2705 No lint issues found.\n"));
+    return;
+  }
+  issues.forEach((issue) => {
+    console.log(
+      chalk7.red(`\u274C Line ${issue.line}: ${issue.message}`)
+    );
+  });
+  console.log(
+    chalk7.yellow(`
+Found ${issues.length} issue(s).
+`)
+  );
+  process.exit(1);
+}
+
 // src/index.ts
 var program = new Command();
+program.command("init").description("Initialize a new environment setup").option("-f, --force", "Overwrite existing files").action(initCommand);
 program.name("envmaster").description("A modern CLI to validate, generate and manage .env files.").version("0.1.0");
+program.addHelpText(
+  "after",
+  `
+
+Examples:
+
+  $ envmaster init
+  $ envmaster init --force
+  $ envmaster doctor
+  $ envmaster validate
+  $ envmaster sync
+  $ envmaster generate
+`
+);
 program.command("sync").description("Sync .env.example with .env").action(syncCommand);
 program.command("validate").description("Validate .env file").action(validateCommand);
 program.command("doctor").description("Run environment diagnostics").action(doctorCommand);
+program.command("generate").description("Generate .env.example from .env").action(generateCommand);
+program.command("secrets").description("Scan .env.example for exposed secrets").action(secretsCommand);
+program.command("lint").description("Lint .env file for common issues").action(lintCommand);
 program.parse();

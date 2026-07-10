@@ -1,9 +1,12 @@
 # 🚀 EnvMaster
 
 ![CI](https://github.com/gaurav5800/envmaster/actions/workflows/ci.yml/badge.svg)
+![npm](https://img.shields.io/npm/v/@gaurav_hasija/envmaster)
+![Downloads](https://img.shields.io/npm/dm/@gaurav_hasija/envmaster)
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue)
 ![Node](https://img.shields.io/badge/Node.js-20+-green)
+![GitHub stars](https://img.shields.io/github/stars/gaurav5800/envmaster?style=social)
 
 A modern TypeScript CLI for validating, linting, synchronizing, generating, and securing `.env` files.
 
@@ -26,10 +29,14 @@ A modern TypeScript CLI for validating, linting, synchronizing, generating, and 
 
 ## 📦 Installation
 
+## npm
+
+https://www.npmjs.com/package/@gaurav_hasija/envmaster
+
 ### Global
 
 ```bash
-npm install -g envmaster
+npm install -g @gaurav_hasija/envmaster
 ```
 
 ### Local
@@ -41,17 +48,17 @@ npm run build
 
 ---
 
-## 🚀 Commands
+## Commands
 
 | Command | Description |
-|----------|-------------|
-| `envmaster init` | Initialize `.env` files |
-| `envmaster validate` | Validate `.env` |
-| `envmaster doctor` | Diagnose environment |
-| `envmaster sync` | Sync `.env.example` |
-| `envmaster generate` | Generate `.env.example` |
-| `envmaster secrets` | Detect exposed secrets |
-| `envmaster lint` | Lint `.env` files |
+|---------|-------------|
+| envmaster init | Initialize .env |
+| envmaster validate | Validate .env |
+| envmaster lint | Lint environment file |
+| envmaster sync | Sync .env.example |
+| envmaster generate | Generate .env.example |
+| envmaster doctor | Diagnose issues |
+| envmaster secrets | Detect secrets |
 
 ---
 
@@ -94,6 +101,11 @@ Contributions, feature requests, and bug reports are welcome.
 Fork the repository and submit a Pull Request.
 
 ---
+
+## 🎬 Demo
+
+![EnvMaster Demo](assets/demo.gif)
+
 
 ## 📄 License
 

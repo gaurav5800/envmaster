@@ -2,46 +2,53 @@
 
 Thank you for your interest in contributing to EnvMaster! 🚀
 
+We welcome bug reports, feature requests, documentation improvements, and code contributions.
+
 ## Getting Started
 
-Clone the repository:
+1. Fork the repository.
+2. Clone your fork.
 
 ```bash
-git clone https://github.com/gaurav5800/envmaster.git
-cd envmaster
+git clone https://github.com/your-username/envmaster.git
 ```
 
-Install dependencies:
+3. Install dependencies.
 
 ```bash
 npm install
 ```
 
-Run in development mode:
+4. Start development.
 
 ```bash
-npm run dev -- doctor
+npm run dev
 ```
 
-Run tests:
+## Running Tests
 
 ```bash
 npm test
 ```
 
-## Development Guidelines
+## Building
 
-- Follow the existing code style.
-- Write unit tests for new features.
-- Keep commits small and descriptive.
-- Update the README if required.
+```bash
+npm run build
+```
 
-## Pull Requests
+## Submitting Changes
 
-1. Fork the repository.
-2. Create a feature branch.
-3. Commit your changes.
-4. Push your branch.
-5. Open a Pull Request.
+1. Create a new branch.
+2. Commit your changes with clear commit messages.
+3. Push the branch.
+4. Open a Pull Request.
 
-Happy coding! 🎉
+## Code Style
+
+- Use TypeScript
+- Keep functions small and readable
+- Write tests for new features
+- Update documentation when necessary
+
+Thank you for helping improve EnvMaster! ❤️

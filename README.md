@@ -29,15 +29,18 @@ A modern TypeScript CLI for validating, linting, synchronizing, generating, and 
 
 ## 📦 Installation
 
+```bash
+npm install -g @gaurav_hasija/envmaster
+```
+
+
 ## npm
 
 https://www.npmjs.com/package/@gaurav_hasija/envmaster
 
 ### Global
 
-```bash
-npm install -g @gaurav_hasija/envmaster
-```
+
 
 ### Local
 
@@ -47,18 +50,18 @@ npm run build
 ```
 
 ---
-
-## Commands
+## 📖 Commands
 
 | Command | Description |
 |---------|-------------|
-| envmaster init | Initialize .env |
-| envmaster validate | Validate .env |
-| envmaster lint | Lint environment file |
-| envmaster sync | Sync .env.example |
-| envmaster generate | Generate .env.example |
-| envmaster doctor | Diagnose issues |
-| envmaster secrets | Detect secrets |
+| `envmaster init` | Initialize a new `.env` setup |
+| `envmaster init --force` | Overwrite existing environment files |
+| `envmaster validate` | Validate `.env` variables |
+| `envmaster doctor` | Run environment diagnostics |
+| `envmaster generate` | Generate `.env.example` from `.env` |
+| `envmaster sync` | Sync `.env.example` with `.env` |
+| `envmaster lint` | Lint `.env` for common issues |
+| `envmaster secrets` | Scan for exposed secrets |
 
 ---
 
@@ -107,6 +110,25 @@ Fork the repository and submit a Pull Request.
 ![EnvMaster Demo](assets/demo.gif)
 
 
+## ⭐ Support
+
+If EnvMaster helps you, please consider giving the project a ⭐ on GitHub.
+
 ## 📄 License
 
 MIT License
+
+## 🗺️ Roadmap
+
+### v0.2.0
+
+- [ ] Interactive `init`
+- [ ] `lint --fix`
+- [ ] Multi-environment support (`.env.local`, `.env.production`)
+- [ ] JSON output
+
+### v0.3.0
+
+- [ ] VS Code Extension
+- [ ] AI-powered suggestions
+- [ ] Git hooks integration

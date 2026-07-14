@@ -41,6 +41,7 @@
   "homepage": "https://github.com/gaurav5800/envmaster#readme",
   "description": "A modern TypeScript CLI for validating, linting, generating, syncing and securing .env files.",
   "dependencies": {
+    "@inquirer/prompts": "^7.10.1",
     "chalk": "^5.6.2",
     "commander": "^15.0.0",
     "dotenv": "^17.4.2",

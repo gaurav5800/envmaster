@@ -1,5 +1,5 @@
 import chalk from "chalk";
-import fs from "fs";
+ import { writeFile } from "../services/env.service";
 const DEFAULT_ENV_TEMPLATE = `# Application
 APP_NAME=
 APP_ENV=development
@@ -19,20 +19,28 @@ export function initCommand(options: { force?: boolean })  {
 let envCreated = false;
 let exampleCreated = false;
 
-if (!fs.existsSync(".env") || options.force) {
-    fs.writeFileSync(".env", DEFAULT_ENV_TEMPLATE);
-    console.log(chalk.green("✓ Created .env"));
-    envCreated = true;
+envCreated = writeFile(
+  ".env",
+  DEFAULT_ENV_TEMPLATE,
+  options.force
+);
+
+if (envCreated) {
+  console.log(chalk.green("✓ Created .env"));
 } else {
-    console.log(chalk.yellow("⚠ .env already exists (skipped)"));
+  console.log(chalk.yellow("⚠ .env already exists (skipped)"));
 }
 
-  if (!fs.existsSync(".env.example") || options.force) {
-    fs.writeFileSync(".env.example", DEFAULT_ENV_TEMPLATE);
-    console.log(chalk.green("✓ Created .env.example"));
-    exampleCreated = true;
+ exampleCreated = writeFile(
+  ".env.example",
+  DEFAULT_ENV_TEMPLATE,
+  options.force
+);
+
+if (exampleCreated) {
+  console.log(chalk.green("✓ Created .env.example"));
 } else {
-    console.log(chalk.yellow("⚠ .env.example already exists (skipped)"));
+  console.log(chalk.yellow("⚠ .env.example already exists (skipped)"));
 }
 
 if (envCreated || exampleCreated) {

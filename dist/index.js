@@ -40,6 +40,14 @@ import path from "path";
 function fileExists(fileName) {
   return fs2.existsSync(path.join(process.cwd(), fileName));
 }
+function writeFile(fileName, content, force = false) {
+  const filePath = path.join(process.cwd(), fileName);
+  if (fs2.existsSync(filePath) && !force) {
+    return false;
+  }
+  fs2.writeFileSync(filePath, content);
+  return true;
+}
 
 // src/commands/doctor.ts
 function doctorCommand() {
@@ -180,7 +188,6 @@ function validateCommand() {
 
 // src/commands/init.ts
 import chalk4 from "chalk";
-import fs4 from "fs";
 var DEFAULT_ENV_TEMPLATE = `# Application
 APP_NAME=
 APP_ENV=development
@@ -199,17 +206,23 @@ function initCommand(options) {
   console.log(chalk4.blue("\n\u{1F680} Initializing EnvMaster...\n"));
   let envCreated = false;
   let exampleCreated = false;
-  if (!fs4.existsSync(".env") || options.force) {
-    fs4.writeFileSync(".env", DEFAULT_ENV_TEMPLATE);
+  envCreated = writeFile(
+    ".env",
+    DEFAULT_ENV_TEMPLATE,
+    options.force
+  );
+  if (envCreated) {
     console.log(chalk4.green("\u2713 Created .env"));
-    envCreated = true;
   } else {
     console.log(chalk4.yellow("\u26A0 .env already exists (skipped)"));
   }
-  if (!fs4.existsSync(".env.example") || options.force) {
-    fs4.writeFileSync(".env.example", DEFAULT_ENV_TEMPLATE);
+  exampleCreated = writeFile(
+    ".env.example",
+    DEFAULT_ENV_TEMPLATE,
+    options.force
+  );
+  if (exampleCreated) {
     console.log(chalk4.green("\u2713 Created .env.example"));
-    exampleCreated = true;
   } else {
     console.log(chalk4.yellow("\u26A0 .env.example already exists (skipped)"));
   }
@@ -284,7 +297,7 @@ Found ${secrets.length} potential secret(s).
 }
 
 // src/commands/lint.ts
-import fs5 from "fs";
+import fs4 from "fs";
 import chalk7 from "chalk";
 
 // src/core/linter.ts
@@ -340,11 +353,11 @@ function lintEnv(content) {
 // src/commands/lint.ts
 function lintCommand() {
   console.log(chalk7.blue("\n\u{1F50D} Linting .env...\n"));
-  if (!fs5.existsSync(".env")) {
+  if (!fs4.existsSync(".env")) {
     console.log(chalk7.red("\u274C .env file not found.\n"));
     process.exit(1);
   }
-  const content = fs5.readFileSync(".env", "utf8");
+  const content = fs4.readFileSync(".env", "utf8");
   const issues = lintEnv(content);
   if (issues.length === 0) {
     console.log(chalk7.green("\u2705 No lint issues found.\n"));
@@ -361,6 +374,76 @@ Found ${issues.length} issue(s).
 `)
   );
   process.exit(1);
+}
+
+// src/commands/interactive-init.ts
+import chalk8 from "chalk";
+import { input, checkbox } from "@inquirer/prompts";
+async function interactiveInitCommand() {
+  console.clear();
+  console.log(chalk8.green.bold("\u{1F680} Welcome to EnvMaster\n"));
+  const projectName = await input({
+    message: "Project name:",
+    default: "my-app"
+  });
+  const variables = await checkbox({
+    message: "Select environment variables",
+    choices: [
+      {
+        name: "DATABASE_URL",
+        value: "DATABASE_URL",
+        checked: true
+      },
+      {
+        name: "JWT_SECRET",
+        value: "JWT_SECRET",
+        checked: true
+      },
+      {
+        name: "API_KEY",
+        value: "API_KEY",
+        checked: true
+      },
+      {
+        name: "PORT",
+        value: "PORT",
+        checked: true
+      },
+      {
+        name: "APP_ENV",
+        value: "APP_ENV",
+        checked: true
+      },
+      {
+        name: "APP_NAME",
+        value: "APP_NAME",
+        checked: true
+      }
+    ]
+  });
+  console.log();
+  console.log(chalk8.green("Project:"), projectName);
+  console.log();
+  console.log(chalk8.cyan("Selected Variables"));
+  variables.forEach((v) => {
+    console.log("\u2713", v);
+  });
+  const template = variables.map((variable) => `${variable}=`).join("\n");
+  const envCreated = writeFile(".env", template);
+  const exampleCreated = writeFile(".env.example", template);
+  console.log();
+  if (envCreated) {
+    console.log(chalk8.green("\u2713 Created .env"));
+  } else {
+    console.log(chalk8.yellow("\u26A0 .env already exists"));
+  }
+  if (exampleCreated) {
+    console.log(chalk8.green("\u2713 Created .env.example"));
+  } else {
+    console.log(chalk8.yellow("\u26A0 .env.example already exists"));
+  }
+  console.log();
+  console.log(chalk8.green.bold("\u{1F389} Project initialized successfully!"));
 }
 
 // src/index.ts
@@ -387,4 +470,5 @@ program.command("doctor").description("Run environment diagnostics").action(doct
 program.command("generate").description("Generate .env.example from .env").action(generateCommand);
 program.command("secrets").description("Scan .env.example for exposed secrets").action(secretsCommand);
 program.command("lint").description("Lint .env file for common issues").action(lintCommand);
+program.command("initx").description("Interactive project initialization").action(interactiveInitCommand);
 program.parse();

@@ -8,7 +8,7 @@ import { validateCommand } from "./commands/validate";
  import { generateCommand } from "./commands/generate";
 import { secretsCommand } from "./commands/secrets";
 import { lintCommand } from "./commands/lint";
-
+import { interactiveInitCommand } from "./commands/interactive-init";
 const program = new Command();
 program
   .command("init")
@@ -65,6 +65,9 @@ program
   .action(lintCommand);
 
 
-
+program
+  .command("initx")
+  .description("Interactive project initialization")
+  .action(interactiveInitCommand);
 
 program.parse();
